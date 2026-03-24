@@ -1,0 +1,14 @@
+services:
+  unified-sniper-bot:
+    build: .
+    container_name: unified-sniper-bot
+    restart: unless-stopped
+    env_file:
+      - .env
+    volumes:
+      - /root/shared-data:/shared-data
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: "3"
