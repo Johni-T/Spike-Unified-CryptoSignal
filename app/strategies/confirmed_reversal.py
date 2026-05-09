@@ -6,7 +6,7 @@ from app.strategies.shared.volume_baseline import median_volume
 
 
 class ConfirmedReversalStrategy(BaseStrategy):
-    key = SignalType.CONFIRMED_REVERSAL.value
+    key = "confirmed_reversal"
     display_name = "Confirmed Spike"
     version = "1.0.0"
 
@@ -48,13 +48,15 @@ class ConfirmedReversalStrategy(BaseStrategy):
             drop_pct = (spike_candle.volume - latest.volume) / spike_candle.volume * 100
             if spike_candle.is_bullish != latest.is_bullish:
                 direction = Direction.CALL if spike_candle.is_bullish else Direction.PUT
+                signal_type = SignalType.CONFIRMED_SPIKE_CONTINUATION
             else:
                 direction = Direction.PUT if spike_candle.is_bullish else Direction.CALL
+                signal_type = SignalType.CONFIRMED_SPIKE_REVERSAL
 
-            signal_id = f"{self.key}_{symbol}_{timeframe}_{spike_candle.open_time}"
+            signal_id = f"{signal_type.value}_{symbol}_{timeframe}_{spike_candle.open_time}"
             event = OpenSignalEvent(
                 signal_id=signal_id,
-                signal_type=SignalType.CONFIRMED_REVERSAL,
+                signal_type=signal_type,
                 strategy_version=self.version,
                 symbol=symbol,
                 timeframe=timeframe,

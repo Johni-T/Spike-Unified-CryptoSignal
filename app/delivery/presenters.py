@@ -7,19 +7,23 @@ from app.domain.models import OpenSignalEvent
 
 TYPE_LABELS = {
     SignalType.EARLY_REVERSAL: "EARLY SPIKE",
-    SignalType.CONFIRMED_REVERSAL: "CONFIRMED SPIKE",
+    SignalType.CONFIRMED_SPIKE_REVERSAL: "CONFIRMED SPIKE REVERSAL",
+    SignalType.CONFIRMED_SPIKE_CONTINUATION: "CONFIRMED SPIKE CONTINUATION",
 }
 TYPE_BADGES = {
     SignalType.EARLY_REVERSAL: "Instant Spike Entry",
-    SignalType.CONFIRMED_REVERSAL: "Spike Confirmed",
+    SignalType.CONFIRMED_SPIKE_REVERSAL: "Weak Follow-Through Reversal",
+    SignalType.CONFIRMED_SPIKE_CONTINUATION: "Opposite Candle Continuation",
 }
 TYPE_EMOJIS = {
     SignalType.EARLY_REVERSAL: "⚡",
-    SignalType.CONFIRMED_REVERSAL: "🧭",
+    SignalType.CONFIRMED_SPIKE_REVERSAL: "🧭",
+    SignalType.CONFIRMED_SPIKE_CONTINUATION: "📈",
 }
 TYPE_SUMMARY = {
     SignalType.EARLY_REVERSAL: "Entry right after the spike candle closes",
-    SignalType.CONFIRMED_REVERSAL: "Entry after the spike gets lower-volume confirmation",
+    SignalType.CONFIRMED_SPIKE_REVERSAL: "Entry against the spike after a same-color weak follow-through candle",
+    SignalType.CONFIRMED_SPIKE_CONTINUATION: "Entry in the spike direction after a lower-volume opposite-color candle",
 }
 DIRECTION_EMOJIS = {
     "CALL": "🟢",

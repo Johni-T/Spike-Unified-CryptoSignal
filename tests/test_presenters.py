@@ -53,8 +53,17 @@ def test_build_open_caption_uses_spike_labels_and_hides_notes() -> None:
 
 def test_build_open_caption_uses_confirmed_spike_label() -> None:
     title, caption = build_open_caption(
-        _event(SignalType.CONFIRMED_REVERSAL), _stats()
+        _event(SignalType.CONFIRMED_SPIKE_REVERSAL), _stats()
     )
 
-    assert title == "CONFIRMED SPIKE"
-    assert "CONFIRMED SPIKE" in caption
+    assert title == "CONFIRMED SPIKE REVERSAL"
+    assert "CONFIRMED SPIKE REVERSAL" in caption
+
+
+def test_build_open_caption_uses_confirmed_spike_continuation_label() -> None:
+    title, caption = build_open_caption(
+        _event(SignalType.CONFIRMED_SPIKE_CONTINUATION), _stats()
+    )
+
+    assert title == "CONFIRMED SPIKE CONTINUATION"
+    assert "CONFIRMED SPIKE CONTINUATION" in caption

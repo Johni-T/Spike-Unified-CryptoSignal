@@ -4,7 +4,7 @@ from app.storage.db import connect
 
 
 class StatsRepository:
-    def get_stats(self, signal_type: str | None = None) -> dict:
+    def get_stats(self, signal_type: str | list[str] | tuple[str, ...] | None = None) -> dict:
         now = datetime.now(timezone.utc)
         periods = {
             "day": now.replace(hour=0, minute=0, second=0, microsecond=0),
@@ -30,14 +30,20 @@ class StatsRepository:
             }
         return result
 
-    def _load_rows(self, signal_type: str | None) -> list[dict]:
+    def _load_rows(
+        self, signal_type: str | list[str] | tuple[str, ...] | None
+    ) -> list[dict]:
         query = (
             "SELECT signal_at, outcome FROM signals WHERE outcome IN ('WIN', 'LOSS')"
         )
         params: tuple = ()
-        if signal_type:
+        if isinstance(signal_type, str) and signal_type:
             query += " AND signal_type = ?"
             params = (signal_type,)
+        elif signal_type:
+            placeholders = ", ".join("?" for _ in signal_type)
+            query += f" AND signal_type IN ({placeholders})"
+            params = tuple(signal_type)
         with connect() as conn:
             raw_rows = conn.execute(query, params).fetchall()
         rows = []

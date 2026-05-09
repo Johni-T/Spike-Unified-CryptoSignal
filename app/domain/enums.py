@@ -13,4 +13,5 @@ class Outcome(StrEnum):
 
 class SignalType(StrEnum):
     EARLY_REVERSAL = "early_reversal"
-    CONFIRMED_REVERSAL = "confirmed_reversal"
+    CONFIRMED_SPIKE_REVERSAL = "confirmed_spike_reversal"
+    CONFIRMED_SPIKE_CONTINUATION = "confirmed_spike_continuation"

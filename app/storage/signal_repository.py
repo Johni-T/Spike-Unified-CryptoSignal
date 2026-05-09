@@ -72,12 +72,22 @@ class SignalRepository:
                 "SELECT * FROM signals WHERE id = ?", (signal_id,)
             ).fetchone()
 
-    def get_recent(self, limit: int = 10, signal_type: str | None = None):
+    def get_recent(
+        self,
+        limit: int = 10,
+        signal_type: str | list[str] | tuple[str, ...] | None = None,
+    ):
         with connect() as conn:
-            if signal_type:
+            if isinstance(signal_type, str) and signal_type:
                 return conn.execute(
                     "SELECT * FROM signals WHERE signal_type = ? ORDER BY signal_at DESC LIMIT ?",
                     (signal_type, limit),
+                ).fetchall()
+            if signal_type:
+                placeholders = ", ".join("?" for _ in signal_type)
+                return conn.execute(
+                    f"SELECT * FROM signals WHERE signal_type IN ({placeholders}) ORDER BY signal_at DESC LIMIT ?",
+                    (*signal_type, limit),
                 ).fetchall()
             return conn.execute(
                 "SELECT * FROM signals ORDER BY signal_label ASC, signal_at DESC LIMIT ?",

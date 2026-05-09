@@ -1,4 +1,4 @@
-from app.domain.enums import Direction
+from app.domain.enums import Direction, SignalType
 from app.domain.models import Candle
 from app.strategies.confirmed_reversal import ConfirmedReversalStrategy
 from app.strategies.early_reversal import EarlyReversalStrategy
@@ -65,6 +65,27 @@ def test_confirmed_reversal_uses_pending_spike_then_opens_signal() -> None:
     assert not resolves
     assert len(opens) == 1
     assert opens[0].direction == Direction.CALL
+    assert opens[0].signal_type == SignalType.CONFIRMED_SPIKE_CONTINUATION
+
+
+def test_confirmed_reversal_same_color_follow_through_opens_reversal_signal() -> None:
+    strategy = ConfirmedReversalStrategy(
+        baseline_window=5, spike_multiplier=2.5, candles_on_chart=10
+    )
+    state = {}
+    base = [candle(idx, 100, 101, 10) for idx in range(1, 6)]
+    spike = candle(6, 100, 110, 30)
+    strategy.on_closed_candle("BTCUSDT", "5m", base + [spike], state)
+
+    confirm = candle(7, 110, 112, 15)
+    opens, resolves = strategy.on_closed_candle(
+        "BTCUSDT", "5m", base + [spike, confirm], state
+    )
+
+    assert not resolves
+    assert len(opens) == 1
+    assert opens[0].direction == Direction.PUT
+    assert opens[0].signal_type == SignalType.CONFIRMED_SPIKE_REVERSAL
 
 
 def test_early_reversal_mean_baseline_filters_follow_up_noise() -> None:

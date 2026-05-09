@@ -8,15 +8,24 @@ from app.storage.signal_repository import SignalRepository
 from app.storage.stats_repository import StatsRepository
 
 
+CONFIRMED_SIGNAL_TYPES = (
+    "confirmed_spike_reversal",
+    "confirmed_spike_continuation",
+)
+
 SIGNAL_ALIASES = {
     "early": "early_reversal",
     "early_spike": "early_reversal",
-    "confirmed": "confirmed_reversal",
-    "confirmed_spike": "confirmed_reversal",
+    "confirmed": CONFIRMED_SIGNAL_TYPES,
+    "confirmed_spike": CONFIRMED_SIGNAL_TYPES,
+    "confirmed_reversal": "confirmed_spike_reversal",
+    "confirmed_spike_reversal": "confirmed_spike_reversal",
+    "confirmed_continuation": "confirmed_spike_continuation",
+    "confirmed_spike_continuation": "confirmed_spike_continuation",
 }
 
 
-def _resolve_signal_type(args: list[str]) -> str | None:
+def _resolve_signal_type(args: list[str]) -> str | tuple[str, ...] | None:
     if not args:
         return None
     return SIGNAL_ALIASES.get(args[0].lower(), args[0].lower())
@@ -45,7 +54,10 @@ async def cmd_markets(update, context) -> None:
 async def cmd_stats(update, context) -> None:
     signal_type = _resolve_signal_type(context.args)
     stats = StatsRepository().get_stats(signal_type)
-    scope = signal_type or "all"
+    if isinstance(signal_type, tuple):
+        scope = ", ".join(signal_type)
+    else:
+        scope = signal_type or "all"
     text = (
         f"Stats scope: {scope}\n"
         f"Today: {stats['day']['wins']}W/{stats['day']['losses']}L ({stats['day']['winrate']}%)\n"
